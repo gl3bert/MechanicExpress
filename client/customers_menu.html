@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Management</title>
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+    <link rel="icon" type="image/x-icon" href="src/gear.png">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+
+<div class="header">
+    <h1>Customer Management</h1>
+    <button onclick="window.location.href='index.html'">
+        <img src="src/home.png" alt="Home Icon">
+    </button>
+</div>
+
+<div class="container">
+    <div class="button-container">
+        <button onclick="showCustomerForm()">
+            <img src="src/create_user.png" alt="Create Icon">
+            <span>New Customer</span>
+        </button>
+        <button onclick="window.location.href='invoices.html'">
+            <img src="src/search.png" alt="Search Icon">
+            <span>Search</span>
+        </button>
+        <button onclick="window.location.href='vehicles.html'">
+            <img src="src/directory.png" alt="Directory Icon">
+            <span>Directory</span>
+        </button>
+    </div>
+</div>
+
+<!-- Modal (Popup) Form -->
+<div id="customer-form-modal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeCustomerForm()">&times;</span>
+        <h2>Create New Customer</h2>
+        <form id="customer-form">
+            <label for="first">First Name:</label>
+            <input type="text" id="first" name="first" required><br><br>
+
+            <label for="last">Last Name:</label>
+            <input type="text" id="last" name="last" required><br><br>
+
+            <label for="phone">Phone:</label>
+            <input type="text" id="phone" name="phone" required><br><br>
+
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required><br><br>
+
+            <button type="button" onclick="submitCustomerForm()">Submit</button>
+            <button type="button" onclick="closeCustomerForm()">Cancel</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Show the customer form modal (popup)
+    function showCustomerForm() {
+        $('#customer-form-modal').show();
+    }
+
+    // Close the customer form modal
+    function closeCustomerForm() {
+        $('#customer-form-modal').hide();
+    }
+
+    // Submit the customer form using AJAX
+    function submitCustomerForm() {
+        const customerData = {
+            first: $('#first').val(),
+            last: $('#last').val(),
+            phone: $('#phone').val(),
+            email: $('#email').val()
+        };
+
+        // Send the data to the /api/customer route
+        $.ajax({
+            url: 'http://localhost:8080/api/customer',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(customerData),
+            success: function(response) {
+                alert('Customer created successfully!');
+                $('#customer-form')[0].reset(); // Reset the form
+                $('#customer-form-modal').hide(); // Hide the form after submission
+            },
+            error: function(error) {
+                alert('Error creating customer: ' + error.responseText);
+            }
+        });
+    }
+</script>
+
+<!-- Popup Modal Styles -->
+<style>
+    /* Modal (Popup) Styles */
+    .modal {
+        display: none; /* Hidden by default */
+        position: fixed;
+        z-index: 1; /* Sit on top */
+        left: 0;
+        top: 0;
+        width: 100%; /* Full width */
+        height: 100%; /* Full height */
+        overflow: auto; /* Enable scroll if needed */
+        background-color: rgb(0, 0, 0); /* Fallback color */
+        background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
+        padding-top: 60px;
+    }
+
+    /* Modal Content */
+    .modal-content {
+        background-color: #fefefe;
+        margin: 5% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 400px;
+        border-radius: 6px;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    /* The Close Button */
+    .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+    }
+
+    .close:hover,
+    .close:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    /* Form Inputs and Buttons */
+    input[type="text"], input[type="email"] {
+        width: 100%;
+        padding: 8px;
+        margin: 5px 0;
+        border-radius: 3px;
+        border: 1px solid #ccc;
+    }
+</style>
+
+</body>
+</html>

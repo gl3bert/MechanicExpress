@@ -11,19 +11,39 @@
 
 <div class="header">
     <h1>Mechanic Express</h1>
+    <!-- <div id="date-time" class="date-time"></div>
+    <script>
+        function updateDateTime() {
+            const now = new Date();
+            const options = {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false,
+            };
+            const dateTimeString = now.toLocaleString('en-US', options);
+            document.getElementById('date-time').innerText = dateTimeString;
+        }
+        updateDateTime();
+        setInterval(updateDateTime, 1000);
+    </script> -->
 </div>
 
 <div class="container">
     <div class="button-container">
-        <button onclick="window.location.href='user-management.html'">
+        <button onclick="window.location.href='customers_menu.html'">
             <img src="src/customers.png" alt="Customer Icon">
             <span>Customers</span>
         </button>
-        <button onclick="window.location.href='vehicle-management.html'">
+        <button onclick="window.location.href='vehicles.html'">
             <img src="src/keys.png" alt="Vehicle Icon">
             <span>Vehicles</span>
         </button>
-        <button onclick="window.location.href='invoice-management.html'">
+        <button onclick="window.location.href='invoices.html'">
             <img src="src/invoices.png" alt="Invoice Icon">
             <span>Invoices</span>
         </button>

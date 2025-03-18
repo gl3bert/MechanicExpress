@@ -5,6 +5,8 @@ import com.mechanicexpress.rest.repository.CustomerRepository;
 import com.mechanicexpress.rest.service.CustomerService;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 /**
  * Implementation for CustomerService interface.
  * Code for methods.
@@ -41,5 +43,11 @@ public class CustomerServiceImpl implements CustomerService {
     public int getNextCustomerId() {
         Integer maxId = customerRepository.findMaxCustomerId();
         return (maxId == null) ? 1 : maxId + 1;
+    }
+
+    // Returns all customers
+    @Override
+    public List<Customer> getAllCustomers() {
+        return customerRepository.findAllCustomers();
     }
 }

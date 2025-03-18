@@ -22,7 +22,7 @@ body {
 }
 
 .header {
-    width: 602px;
+    width: 601.5px;
     margin: 50px auto;
     margin-bottom: 0;
     background: #010081;
@@ -35,6 +35,29 @@ body {
     border-top-right-radius: 6px; /* Slightly round top edges */
     border-top-left-radius: 6px;
     box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.5);
+
+    display: flex;
+    justify-content: space-between;
+
+}
+
+/* For the icon */
+.header img {
+    width: 32px;  /* Fixed width */
+    height: 32px; /* Fixed height */
+    object-fit: contain;  /* Ensures the image does not stretch */
+}
+
+.header button {
+    width: 32px;
+    height: 32px;
+    background: #010081;
+    box-shadow: 0px 0px 0px;
+    margin-top: 25px;
+}
+
+.date-time {
+    margin-top: 22px;
 }
 
 /* Header title */
@@ -84,4 +107,23 @@ button img {
     width: 64px;
     height: 64px;
     margin-bottom: 10px;
+}
+
+
+/* Table styling */
+.customers-table {
+    width: 100%;
+    border-collapse: collapse;  /* Ensures borders between table cells */
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+/* Table headers */
+.customers-table th {
+    background-color: #010081;
+    color: white;
+    padding: 10px;
+    text-align: left;  /* Left-align text */
+    border: 1px solid #010081;  /* Add divider lines */
+    font-weight: bold;
 }

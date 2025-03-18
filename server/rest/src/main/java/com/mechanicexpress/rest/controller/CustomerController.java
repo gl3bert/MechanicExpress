@@ -4,6 +4,8 @@ import com.mechanicexpress.rest.model.Customer;
 import com.mechanicexpress.rest.service.CustomerService;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
  * Controller for Customer class.
  * Handles API requests.
@@ -31,5 +33,11 @@ public class CustomerController {
     @GetMapping("{customerId}")
     public Customer getCustomerById(@PathVariable("customerId") int customerId) {
         return customerService.getCustomer(customerId);
+    }
+
+    // Access all customers.
+    @GetMapping("/all")
+    public List<Customer> getAllCustomers() {
+        return customerService.getAllCustomers();
     }
 }
