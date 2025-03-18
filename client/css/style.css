@@ -1,0 +1,87 @@
+/* Body style */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #c0c0c0;
+    margin: 0;
+    padding: 20px;
+    text-align: center;
+}
+
+/* Main container */
+.container {
+    width: 600px;
+    margin: 50px auto;
+    margin-top: 0;
+    background-color: #e0e0e0;
+    border: 3px solid #010081;
+    padding: 20px;
+    border-radius: 6px; /* Round all edges */
+    border-top-left-radius: 0; /* Keep top edges square */
+    border-top-right-radius: 0;
+    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.5);
+}
+
+.header {
+    width: 602px;
+    margin: 50px auto;
+    margin-bottom: 0;
+    background: #010081;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    padding: 8px 20px; /* Reduce vertical padding */
+    text-align: center;
+    border: 2px solid #010081;
+    border-top-right-radius: 6px; /* Slightly round top edges */
+    border-top-left-radius: 6px;
+    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.5);
+}
+
+/* Header title */
+h1 {
+    font-size: 20px;
+    color: #ffffff;
+    background-color: #010081;
+    padding: 5px;
+    border: 2px solid #010081;
+    text-align: left;
+    border-radius: 3px;
+}
+
+/* Button container - horizontal layout */
+.button-container {
+    display: flex;
+    justify-content: space-between;
+}
+
+/* Button styling */
+button {
+    width: 180px;
+    height: 160px;
+    background-color: #e0e0e0;
+    border: 2px solid #010081;
+    color: black;
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+    border-radius: 3px;
+    cursor: pointer;
+    box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Button hover effect */
+button:hover {
+    background-color: #010081;
+    color: white;
+}
+
+/* Icons inside buttons */
+button img {
+    width: 64px;
+    height: 64px;
+    margin-bottom: 10px;
+}
