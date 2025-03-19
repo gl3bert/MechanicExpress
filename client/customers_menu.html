@@ -8,6 +8,9 @@
     <link rel="icon" type="image/x-icon" href="src/gear.png">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
+
+<div class="popup-overlay"></div>
+
 <body>
 
 <div class="header">
@@ -34,51 +37,100 @@
     </div>
 </div>
 
-<!-- Modal (Popup) Form -->
-<div id="customer-form-modal" class="modal">
-    <div class="modal-content">
-        <span class="close" onclick="closeCustomerForm()">&times;</span>
-        <h2>Create New Customer</h2>
-        <form id="customer-form">
-            <label for="first">First Name:</label>
-            <input type="text" id="first" name="first" required><br><br>
 
-            <label for="last">Last Name:</label>
-            <input type="text" id="last" name="last" required><br><br>
+<div class="popup">
+    <div class="popup-header">
+        <h3>New Customer</h3>
+    </div>
 
-            <label for="phone">Phone:</label>
-            <input type="text" id="phone" name="phone" required><br><br>
+    <div class="popup-container">
+        <div class="popup-data-field">
+            <label for="first">First Name</label>
+            <input type="text" id="first" name="first" required>
+        </div>
+        <div class="popup-data-field">
+            <label for="last">Last Name</label>
+            <input type="text" id="last" name="last" required>
+        </div>
+        <div class="popup-data-field">
+            <label for="phone">Phone Number</label>
+            <input type="text" id="phone" name="phone" required>
+        </div>
+        <div class="popup-data-field">
+            <label for="email">Email Address</label>
+            <input type="text" id="email" name="email" required>
+        </div>
 
-            <label for="email">Email:</label>
-            <input type="email" id="email" name="email" required><br><br>
+        <div class="popup-buttons">
+            <button type="button" class="popup-button cancel" onclick="closeCustomerForm()">
+                <img src="src/cancel.png" alt="Cancel Icon">
+                <span>Cancel</span>
+            </button>
+            <button type="button" class="popup-button add" onclick="submitCustomerForm()">
+                <img src="src/save_check.png" alt="Save Icon">
+                <span>Add</span>
+            </button>
+        </div>
 
-            <button type="button" onclick="submitCustomerForm()">Submit</button>
-            <button type="button" onclick="closeCustomerForm()">Cancel</button>
-        </form>
     </div>
 </div>
 
+
 <script>
-    // Show the customer form modal (popup)
+    // Show popup and overlay
     function showCustomerForm() {
-        $('#customer-form-modal').show();
+        $('.popup-overlay').show();
+        $('.popup').show();
     }
 
-    // Close the customer form modal
+    // Hide popup and overlay
     function closeCustomerForm() {
-        $('#customer-form-modal').hide();
+        $('.popup-overlay').hide();
+        $('.popup').hide();
+        clearForm(); // Clear form when closing
+    }
+
+    // Clear form fields
+    function clearForm() {
+        $('#first').val('');
+        $('#last').val('');
+        $('#phone').val('');
+        $('#email').val('');
+    }
+
+    // Validate phone number (must be 10 digits)
+    function isValidPhone(phone) {
+        return /^\d{10}$/.test(phone);
+    }
+
+    // Validate email format
+    function isValidEmail(email) {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
     }
 
     // Submit the customer form using AJAX
     function submitCustomerForm() {
-        const customerData = {
-            first: $('#first').val(),
-            last: $('#last').val(),
-            phone: $('#phone').val(),
-            email: $('#email').val()
-        };
+        const first = $('#first').val().trim();
+        const last = $('#last').val().trim();
+        const phone = $('#phone').val().trim();
+        const email = $('#email').val().trim();
 
-        // Send the data to the /api/customer route
+        // Error checks
+        if (first === '' || last === '' || phone === '' || email === '') {
+            alert('All fields are required.');
+            return;
+        }
+        if (!isValidPhone(phone)) {
+            alert('Phone number must be exactly 10 digits.');
+            return;
+        }
+        if (!isValidEmail(email)) {
+            alert('Enter a valid email address.');
+            return;
+        }
+
+        const customerData = { first, last, phone, email };
+
         $.ajax({
             url: 'http://localhost:8080/api/customer',
             type: 'POST',
@@ -86,68 +138,116 @@
             data: JSON.stringify(customerData),
             success: function(response) {
                 alert('Customer created successfully!');
-                $('#customer-form')[0].reset(); // Reset the form
-                $('#customer-form-modal').hide(); // Hide the form after submission
+                clearForm();
+                closeCustomerForm();
             },
             error: function(error) {
                 alert('Error creating customer: ' + error.responseText);
             }
         });
     }
+
+    $(document).ready(function () {
+        $('.popup-button.cancel').click(function () {
+            closeCustomerForm();
+        });
+    });
 </script>
 
-<!-- Popup Modal Styles -->
+
 <style>
-    /* Modal (Popup) Styles */
-    .modal {
-        display: none; /* Hidden by default */
-        position: fixed;
-        z-index: 1; /* Sit on top */
-        left: 0;
-        top: 0;
-        width: 100%; /* Full width */
-        height: 100%; /* Full height */
-        overflow: auto; /* Enable scroll if needed */
-        background-color: rgb(0, 0, 0); /* Fallback color */
-        background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
-        padding-top: 60px;
-    }
-
-    /* Modal Content */
-    .modal-content {
-        background-color: #fefefe;
-        margin: 5% auto;
-        padding: 20px;
-        border: 1px solid #888;
+    .popup {
+        display: none;
         width: 400px;
-        border-radius: 6px;
-        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+        border: 3px solid #010081;
+        background-color: #e0e0e0;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.2);
+        padding-top: 50px; /* Space for the header */
+        border-radius: 5px;
+        z-index: 1001;
     }
 
-    /* The Close Button */
-    .close {
-        color: #aaa;
-        float: right;
-        font-size: 28px;
+    .popup-header {
+        background: #010081;
+        color: white;
+        padding-left: 20px;
+        position: absolute;
+        width: 380px;
+        top: 0;
+        left: 0;
+        text-align: left;
+    }
+
+    .popup-container {
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        text-align: left;
+    }
+
+    .popup-data-field {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .popup-data-field label {
         font-weight: bold;
     }
 
-    .close:hover,
-    .close:focus {
-        color: black;
-        text-decoration: none;
-        cursor: pointer;
-    }
-
-    /* Form Inputs and Buttons */
-    input[type="text"], input[type="email"] {
-        width: 100%;
-        padding: 8px;
-        margin: 5px 0;
+    .popup-data-field input {
+        width: 95%;
+        padding: 5px;
+        border: 1px solid #010081;
         border-radius: 3px;
-        border: 1px solid #ccc;
+        box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.2);
     }
-</style>
 
+    .popup-buttons {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 15px;
+    }
+
+    .popup-button {
+        height: 50px;
+        padding: 8px 15px;
+        border-radius: 3px;
+        cursor: pointer;
+        font-size: 14px;
+        gap: 5px;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        color: #e0e0e0;
+        border: 2px solid #010081;
+        color: black;
+    }
+
+    .popup-button img {
+        width: 20px;
+        height: 20px;
+        padding-top: 8px;
+        padding-left: 0px;
+        padding-right: 5px;
+    }
+
+    .popup-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+    }
+
+</style>
 </body>
 </html>
