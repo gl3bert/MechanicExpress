@@ -1,9 +1,13 @@
 package com.mechanicexpress.rest.controller;
 
+import com.mechanicexpress.rest.model.vehicle.Make;
+import com.mechanicexpress.rest.model.vehicle.Model;
 import com.mechanicexpress.rest.service.VehicleService;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Controller for Vehicle class and its supplemental classes.
@@ -42,5 +46,18 @@ public class VehicleController {
     @PostMapping("/state/add")
     public void addStates(@RequestBody List<String> states) {
         vehicleService.addStates(states);
+    }
+
+    @PostMapping("/model/add")
+    public void addModelsBatch(@RequestBody List<Map<String, String>> modelsRequest) {
+        List<Model> models = new ArrayList<>();
+        for (Map<String, String> request : modelsRequest) {
+            String modelName = request.get("model");
+            String makeName = request.get("make");
+            Make make = vehicleService.getMake(makeName);
+            Model model = new Model(modelName, make);
+            models.add(model);
+        }
+        vehicleService.addModels(models);
     }
 }

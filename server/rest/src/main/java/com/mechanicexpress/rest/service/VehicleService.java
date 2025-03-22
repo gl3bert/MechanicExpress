@@ -13,10 +13,12 @@ import java.util.List;
 public interface VehicleService {
     boolean addVehicle(Vehicle vehicle);
 
+
     // Supplemental functions.
     void addMakes(List<String> makes);
+    Make getMake(String name);
     void addColors(List<String> color);
     void addStates(List<String> state);
     void addYears(List<Integer> years);
-    void addModel(List<Model> models);
+    void addModels(List<Model> models);
 }

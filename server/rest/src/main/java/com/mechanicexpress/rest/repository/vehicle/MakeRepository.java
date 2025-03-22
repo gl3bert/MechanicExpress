@@ -20,4 +20,6 @@ public interface MakeRepository extends JpaRepository<Make, Integer> {
     @Query("SELECT CASE WHEN COUNT(m) > 0 THEN true ELSE false END FROM Make m WHERE m.name = :make")
     boolean alreadyExists(@Param("make") String make);
 
+    @Query("SELECT m FROM Make m WHERE m.name = :name")
+    Make findByName(@Param("name") String name);
 }

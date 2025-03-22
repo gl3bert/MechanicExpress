@@ -1,9 +1,7 @@
 package com.mechanicexpress.rest.service.impl;
 
 import com.mechanicexpress.rest.model.Vehicle;
-import com.mechanicexpress.rest.model.VehicleRel;
 import com.mechanicexpress.rest.model.vehicle.*;
-import com.mechanicexpress.rest.repository.CustomerRepository;
 import com.mechanicexpress.rest.repository.VehicleRepository;
 import com.mechanicexpress.rest.repository.vehicle.*;
 import com.mechanicexpress.rest.service.VehicleService;
@@ -60,6 +58,12 @@ public class VehicleServiceImpl implements VehicleService {
         }
     }
 
+    // Return make by its name.
+    @Override
+    public Make getMake(String name) {
+        return makeRepository.findByName(name);
+    }
+
     // Add a list of colors.
     @Override
     public void addColors(List<String> colors) {
@@ -104,7 +108,17 @@ public class VehicleServiceImpl implements VehicleService {
 
     // Add a list of models.
     @Override
-    public void addModel(List<Model> models) {
-        modelRepository.saveAll(models);
+    public void addModels(List<Model> models) {
+        for (Model model : models) {
+            if (!modelRepository.existsByMakeAndModel(model.getName(), model.getMake().getMakeId())) {
+                if (modelRepository.findMaxModelId() != null) {
+                    model.setModelId(modelRepository.findMaxModelId() + 1);
+                }
+                else {
+                    model.setModelId(1);
+                }
+                modelRepository.save(model);
+            }
+        }
     }
 }
