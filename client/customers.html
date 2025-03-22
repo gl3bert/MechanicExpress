@@ -14,7 +14,7 @@
 <div class="header">
     <h1>Customer Management</h1>
     <button onclick="window.location.href='index.html'">
-        <img src="src/home.png" alt="Home Icon">
+        <img src="src/x.png" alt="Home Icon">
     </button>
 </div>
 
@@ -93,7 +93,7 @@
     </div>
     <div class="popup-buttons">
         <button type="button" class="popup-button close-dir" onclick="closeDirectoryTable()">
-            <img src="src/cancel.png" alt="Cancel Icon">
+            <img src="src/x.png" alt="Close Icon">
             <span>Close</span>
         </button>
     </div>
@@ -132,7 +132,7 @@
                 <span>Edit</span>
             </button>
             <button type="button" class="popup-button cancel" onclick="closeCustomerCard()">
-                <img src="src/cancel.png" alt="Cancel Icon">
+                <img src="src/x.png" alt="Close Icon">
                 <span>Close</span>
             </button>
         </div>
@@ -263,11 +263,7 @@
     }
 
     function viewCustomerDetails(customerId) {
-        alert('Viewing details for customer ID: ' + customerId);
-        // Here, you can expand this function to fetch and display more customer details.
-    }
-
-    function viewCustomerDetails(customerId) {
+        closeDirectoryTable();
         $.ajax({
             url: `http://localhost:8080/api/customer/${customerId}`,
             type: 'GET',
@@ -312,6 +308,7 @@
                 alert('Error fetching customer details: ' + error.responseText);
             }
         });
+        showDirectoryTable();
     }
 
     function closeCustomerCard() {

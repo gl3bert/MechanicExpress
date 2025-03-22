@@ -26,8 +26,10 @@ public class Customer {
     @Column(name = "email")
     private String email;
 
+    // Default empty constructor.
     public Customer() {}
 
+    // Parameterized constructor for creation.
     public Customer(String first, String last, String phone, String email) {
         this.first = first;
         this.last = last;
@@ -35,6 +37,7 @@ public class Customer {
         this.email = email;
     }
 
+    // Getters and Setters.
     public int getCustomerId() { return customerId; }
     public void setCustomerId(int customerId) { this.customerId = customerId; }
     public String getFirst() { return first; }
