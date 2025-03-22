@@ -42,7 +42,7 @@ public class CustomerServiceImpl implements CustomerService {
     // Find the next customer ID from existing table.
     public int getNextCustomerId() {
         Integer maxId = customerRepository.findMaxCustomerId();
-        return (maxId == null) ? 1 : maxId + 1;
+        return (maxId == null) ? 1000 : maxId + 1;
     }
 
     // Returns all customers

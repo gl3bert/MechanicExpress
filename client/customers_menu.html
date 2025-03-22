@@ -28,14 +28,14 @@
             <img src="src/search.png" alt="Search Icon">
             <span>Search</span>
         </button>
-        <button onclick="window.location.href='vehicles.html'">
+        <button onclick="showDirectoryTable()">
             <img src="src/directory.png" alt="Directory Icon">
             <span>Directory</span>
         </button>
     </div>
 </div>
 
-<div class="popup">
+<div class="popup customerinput-popup">
     <div class="popup-header">
         <h3>New Customer</h3>
     </div>
@@ -75,14 +75,95 @@
     </div>
 </div>
 
+<div class="popup directory-popup">
+    <div class="popup-header">
+        <h3>Customer Directory</h3>
+    </div>
+    <div class="popup-container">
+        <table id="directoryTable" class="display">
+            <thead>
+            <tr>
+                <th>Last Name</th>
+                <th>First Name</th>
+                <th>ID</th>
+            </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+    <div class="popup-buttons">
+        <button type="button" class="popup-button close-dir" onclick="closeDirectoryTable()">
+            <img src="src/cancel.png" alt="Cancel Icon">
+            <span>Close</span>
+        </button>
+    </div>
+</div>
+
+<div class="popup customer-card-popup">
+    <div class="popup-header">
+        <h3 id="customerCardName">Customer Details</h3>
+    </div>
+    <div class="popup-container">
+        <div class="card-left">
+        <div class="data-fields">
+            <p><strong>ID:</strong> <span id="customerId"></span></p>
+            <p><strong>Phone:</strong> <span id="customerPhone"></span></p>
+            <p><strong>Email:</strong> <span id="customerEmail"></span></p>
+        </div>
+        <h4>Associated Vehicles</h4>
+        <table id="vehicleTable">
+            <thead>
+            <tr>
+                <th>Make</th>
+                <th>Model</th>
+                <th>Year</th>
+                <th>Plate</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td colspan="4">No vehicles found.</td>
+            </tr>
+            </tbody>
+        </table>
+        <div class="popup-buttons">
+            <button type="button" class="popup-button edit" onclick="enableEditCustomer()">
+                <img src="src/edit.png" alt="Edit Icon">
+                <span>Edit</span>
+            </button>
+            <button type="button" class="popup-button cancel" onclick="closeCustomerCard()">
+                <img src="src/cancel.png" alt="Cancel Icon">
+                <span>Close</span>
+            </button>
+        </div>
+        </div>
+    </div>
+</div>
+
+
 
 <script>
+
+    function positionPopups() {
+        let container = document.querySelector('.container');
+        let containerRect = container.getBoundingClientRect();
+        let topPosition = containerRect.bottom + 30; // 30px below the bottom of the container
+
+        document.querySelectorAll('.popup').forEach(popup => {
+            popup.style.top = `${topPosition}px`;
+        });
+    }
+
+    window.onload = positionPopups;
+    window.onresize = positionPopups;
+
     function showCustomerForm() {
-        $('.popup').show();
+        $('.directory-popup').hide();
+        $('.customerinput-popup').show();
     }
 
     function closeCustomerForm() {
-        $('.popup').hide();
+        $('.customerinput-popup').hide();
         clearForm();
     }
 
@@ -142,11 +223,108 @@
             closeCustomerForm();
         });
     });
+
+    function closeDirectoryTable() {
+        $('.directory-popup').hide();
+    }
+
+    function showDirectoryTable() {
+        $('.directory-popup').show();
+
+        $.ajax({
+            url: 'http://localhost:8080/api/customer/all',
+            type: 'GET',
+            success: function(data) {
+                let tableBody = $('#directoryTable tbody');
+                tableBody.empty();
+
+                // Sort data alphabetically by last name
+                data.sort((a, b) => a.last.localeCompare(b.last));
+
+                data.forEach(customer => {
+                    tableBody.append(`
+                    <tr>
+                        <td>${customer.last}</td>
+                        <td>${customer.first}</td>
+                        <td>${customer.customerId}</td>
+                        <td>
+                            <button class="details-button" onclick="viewCustomerDetails(${customer.customerId})">
+                                Details
+                            </button>
+                        </td>
+                    </tr>
+                `);
+                });
+            },
+            error: function(error) {
+                alert('Error fetching customers: ' + error.responseText);
+            }
+        });
+    }
+
+    function viewCustomerDetails(customerId) {
+        alert('Viewing details for customer ID: ' + customerId);
+        // Here, you can expand this function to fetch and display more customer details.
+    }
+
+    function viewCustomerDetails(customerId) {
+        $.ajax({
+            url: `http://localhost:8080/api/customer/${customerId}`,
+            type: 'GET',
+            success: function(customer) {
+                // Populate customer details
+                $('#customerCardName').text(`${customer.first} ${customer.last}`);
+                $('#customerId').text(customer.customerId);
+                $('#customerPhone').text(customer.phone);
+                $('#customerEmail').text(customer.email);
+
+                // Fetch associated vehicles
+                $.ajax({
+                    url: `http://localhost:8080/api/customer/${customerId}/vehicles`,
+                    type: 'GET',
+                    success: function(vehicles) {
+                        let vehicleTableBody = $('#vehicleTable tbody');
+                        vehicleTableBody.empty();
+
+                        if (vehicles.length > 0) {
+                            vehicles.forEach(vehicle => {
+                                vehicleTableBody.append(`
+                                <tr>
+                                    <td>${vehicle.make}</td>
+                                    <td>${vehicle.model}</td>
+                                    <td>${vehicle.year}</td>
+                                    <td>${vehicle.plate}</td>
+                                </tr>
+                            `);
+                            });
+                        } else {
+                            vehicleTableBody.append('<tr><td colspan="4">No vehicles found.</td></tr>');
+                        }
+                    },
+                    error: function(error) {
+                        console.error('Error fetching vehicles:', error);
+                    }
+                });
+
+                $('.customer-card-popup').show();
+            },
+            error: function(error) {
+                alert('Error fetching customer details: ' + error.responseText);
+            }
+        });
+    }
+
+    function closeCustomerCard() {
+        $('.customer-card-popup').hide();
+    }
+
+
+
 </script>
 
 
 <style>
-    .popup {
+    .popup, .directory-popup {
         display: none;
         width: 640px;
         border: 3px solid #010081;
@@ -154,9 +332,8 @@
         position: fixed;
         box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.5);
         border-radius: 5px;
-        top: 550px;
         left: 50%;
-        transform: translate(-50%, -50%);
+        transform: translate(-50%, 0);
     }
 
     .data-fields {
@@ -241,6 +418,38 @@
     .popup-button.add {
         border-width: 3px;
     }
+
+    #directoryTable th, #directoryTable td {
+        width: 150px;
+        text-align: left;
+        padding: 5px;
+        border: 1px solid #010081;
+    }
+
+    .details-button {
+        padding: 5px 10px;
+        background-color: #e0e0e0;
+        color: black;
+        border: 1px solid #010081;
+        border-radius: 3px;
+        cursor: pointer;
+        height: 30px;
+    }
+
+    .details-button:hover {
+        background-color: #010081;
+        color: white;
+    }
+
+    .close-dir {
+        margin-left: 73.5%;
+    }
+
+    .card-left {
+        display: flex;
+        flex-direction: column;
+    }
+
 
 </style>
 </body>
