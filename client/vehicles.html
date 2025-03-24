@@ -6,6 +6,7 @@
     <title>Mechanic Main</title>
     <link rel="icon" type="image/x-icon" href="src/gear.png">
     <link rel="stylesheet" type="text/css" href="css/style.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
 
@@ -17,7 +18,7 @@
 </div>
 <div class="container">
     <div class="button-container">
-        <button onclick="showCustomerForm()">
+        <button onclick="showVehicleForm()">
             <img src="src/key.png" alt="Create Icon">
             <span>New Vehicle</span>
         </button>
@@ -31,5 +32,319 @@
         </button>
     </div>
 </div>
+
+<div class="popup vehicleinput-popup">
+    <div class="popup-header">
+        <h3>New Vehicle</h3>
+    </div>
+    <div class="popup-container">
+        <div class="data-fields">
+            <div class="popup-data-field">
+                <label for="make">Make</label>
+                <select id="make" name="make" required onchange="loadModels()">
+                    <option value="">Select Make</option>
+                </select>
+            </div>
+            <div class="popup-data-field">
+                <label for="model">Model</label>
+                <select id="model" name="model" required>
+                    <option value="">Select Model</option>
+                </select>
+            </div>
+            <div class="popup-data-field">
+                <label for="year">Year</label>
+                <select id="year" name="year" required>
+                    <option value="">Select Year</option>
+                </select>
+            </div>
+            <div class="popup-data-field">
+                <label for="color">Color</label>
+                <select id="color" name="color" required>
+                    <option value="">Select Color</option>
+                </select>
+            </div>
+            <div class="popup-data-field">
+                <label for="state">State</label>
+                <select id="state" name="state" required>
+                    <option value="">Select State</option>
+                </select>
+            </div>
+            <div class="popup-data-field">
+                <label for="license_plate">License Plate</label>
+                <input type="text" id="license_plate" name="license_plate" required>
+            </div>
+            <div class="popup-data-field">
+                <label for="vin">VIN</label>
+                <input type="text" id="vin" name="vin" required>
+            </div>
+        </div>
+        <div class="popup-buttons">
+            <button type="button" class="popup-button addvehicle">
+                <img src="src/customers.png" alt="Save Icon">
+                <span>Link to Customer</span>
+            </button>
+            <button type="button" class="popup-button cancel" onclick="closeVehicleForm()">
+                <img src="src/delete.png" alt="Cancel Icon">
+                <span>Cancel</span>
+            </button>
+            <button type="button" class="popup-button save" onclick="submitVehicleForm()">
+                <img src="src/save_check.png" alt="Save Icon">
+                <span>Save Vehicle</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    function positionPopups() {
+        let container = document.querySelector('.container');
+        let containerRect = container.getBoundingClientRect();
+        let topPosition = containerRect.bottom + 30; // 30px below the bottom of the container
+
+        document.querySelectorAll('.popup').forEach(popup => {
+            popup.style.top = `${topPosition}px`;
+        });
+    }
+
+    window.onload = positionPopups;
+    window.onresize = positionPopups;
+
+
+    function showVehicleForm() {
+        const popup = document.querySelector('.vehicleinput-popup');
+        popup.style.display = 'block'; // Makes the popup visible
+    }
+
+    function closeVehicleForm() {
+        const popup = document.querySelector('.vehicleinput-popup');
+        popup.style.display = 'none'; // Hides the popup
+        clearForm(); // Optional, clear the form fields
+    }
+
+    function submitVehicleForm() {
+        let vehicleData = {
+            makeId: $("#make").val(),
+            modelId: $("#model").val(),
+            year: $("#year").val(),
+            colorId: $("#color").val(),
+            stateId: $("#state").val(),
+            licensePlate: $("#license_plate").val(),
+            vin: $("#vin").val()
+        };
+
+        // Validate required fields
+        for (let key in vehicleData) {
+            if (!vehicleData[key]) {
+                alert("Please fill out all fields.");
+                return;
+            }
+        }
+
+        // Send POST request
+        $.ajax({
+            url: "http://localhost:8080/api/vehicle/add",
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify(vehicleData),
+            success: function(response) {
+                alert("Vehicle added successfully!");
+                closeVehicleForm(); // Hide the popup
+                clearForm(); // Reset the form
+            },
+            error: function(xhr, status, error) {
+                alert("Error adding vehicle: " + xhr.responseText);
+            }
+        });
+    }
+
+    function clearForm() {
+        $("#make, #model, #year, #color, #state").val("");
+        $("#license_plate, #vin").val("");
+    }
+
+    $(document).ready(function() {
+        loadMakes();
+        loadYears();
+        loadColors();
+        loadStates();
+    });
+
+    function loadMakes() {
+        $.get("http://localhost:8080/api/vehicle/make/all", function(data) {
+            $("#make").append(data.map(make => `<option value="${make.makeId}">${make.name}</option>`));
+        });
+    }
+
+    function loadModels() {
+        let makeId = $("#make").val();
+        if (!makeId) {
+            $("#model").html('<option value="">Select Model</option>');
+            return;
+        }
+        $.get(`http://localhost:8080/api/vehicle/model/${makeId}`, function(data) {
+            let options = '<option value="">Select Model</option>';
+            options += data.map(model => `<option value="${model.modelId}">${model.name}</option>`).join("");
+            $("#model").html(options);
+        });
+    }
+
+
+    function loadYears() {
+        let currentYear = new Date().getFullYear();
+        for (let year = currentYear; year >= 1980; year--) {
+            $("#year").append(`<option value="${year}">${year}</option>`);
+        }
+    }
+
+    function loadColors() {
+        $.get("http://localhost:8080/api/vehicle/color/all", function(data) {
+            $("#color").append(data.map(color => `<option value="${color.colorId}">${color.name}</option>`));
+        });
+    }
+
+    function loadStates() {
+        $.get("http://localhost:8080/api/vehicle/state/all", function(data) {
+            $("#state").append(data.map(color => `<option value="${color.stateId}">${color.name}</option>`));
+        });
+    }
+
+</script>
+
+ <style>
+    .popup, .directory-popup {
+        display: none;
+        width: 640px;
+        border: 3px solid #010081;
+        background-color: #e0e0e0;
+        position: fixed;
+        box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.5);
+        border-radius: 5px;
+        left: 50%;
+        transform: translate(-50%, 0);
+    }
+
+    .data-fields {
+        width: 400px;
+    }
+
+    .popup-header {
+        background: #010081;
+        color: white;
+        padding-left: 20px;
+        position: absolute;
+        width: 620px;
+        height: 55px;
+        top: 0;
+        left: 0;
+        text-align: left;
+    }
+
+    .popup-header h3 {
+        font-size: 12pt;
+    }
+
+    .popup-container {
+        margin-top: 50px;
+        padding: 20px;
+        display: flex;
+        flex-direction: row;
+        gap: 10px;
+        text-align: left;
+    }
+
+    .popup-data-field {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .popup-data-field label {
+        font-weight: bold;
+    }
+
+    .popup-data-field input {
+        width: 80%;
+        padding: 5px;
+        border: 1px solid #010081;
+        border-radius: 3px;
+        box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .popup-buttons {
+        display: flex;
+        justify-content: flex-end;
+        flex-direction: column;
+        gap: 10px;
+        margin-right: 50px;
+        margin-bottom: 20px;
+        margin-top: 22px;
+    }
+
+    .popup-button {
+        height: 50px;
+        padding: 8px 15px;
+        border-radius: 3px;
+        cursor: pointer;
+        font-size: 14px;
+        gap: 5px;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        color: #e0e0e0;
+        border: 2px solid #010081;
+        color: black;
+    }
+
+    .popup-button img {
+        width: 20px;
+        height: 20px;
+        padding-top: 8px;
+        padding-left: 0px;
+        padding-right: 5px;
+    }
+
+    .popup-button.save {
+        border-width: 3px;
+    }
+
+    #directoryTable th, #directoryTable td {
+        width: 150px;
+        text-align: left;
+        padding: 5px;
+        border: 1px solid #010081;
+    }
+
+    #make, #model, #year, #color, #state {
+        width: 300px;
+        height: 29px;
+        border: 1px solid #010081;
+        border-radius: 3px;
+        box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .details-button {
+        padding: 5px 10px;
+        background-color: #e0e0e0;
+        color: black;
+        border: 1px solid #010081;
+        border-radius: 3px;
+        cursor: pointer;
+        height: 30px;
+    }
+
+    .details-button:hover {
+        background-color: #010081;
+        color: white;
+    }
+
+    .close-dir {
+        margin-left: 73.5%;
+    }
+
+    .card-left {
+        display: flex;
+        flex-direction: column;
+    }
+</style>
+
 </body>
 </html>

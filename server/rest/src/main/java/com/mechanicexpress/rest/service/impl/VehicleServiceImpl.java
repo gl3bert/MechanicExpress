@@ -35,9 +35,15 @@ public class VehicleServiceImpl implements VehicleService {
         this.yearRepository = yearRepository;
     }
 
+    // Add a new vehicle.
     @Override
-    public boolean addVehicle(Vehicle vehicle) {
-        return false;
+    public void addVehicle(Vehicle vehicle) {
+        if (vehicleRepository.findMaxVehicleId() != null) {
+            vehicle.setVehicleId(vehicleRepository.findMaxVehicleId() + 1);
+        }
+        else {
+            vehicle.setVehicleId(1);
+        }
     }
 
     /* Supplemental methods for populating SQL tables with sample values */
@@ -64,6 +70,12 @@ public class VehicleServiceImpl implements VehicleService {
         return makeRepository.findByName(name);
     }
 
+    // Get the list of makes.
+    @Override
+    public List<Make> getMakes() {
+        return makeRepository.findAll();
+    }
+
     // Add a list of colors.
     @Override
     public void addColors(List<String> colors) {
@@ -78,6 +90,12 @@ public class VehicleServiceImpl implements VehicleService {
                 colorRepository.save(c);
             }
         }
+    }
+
+    // Get the list of colors.
+    @Override
+    public List<Color> getColors() {
+        return colorRepository.findAll();
     }
 
     // Add a list of states.
@@ -96,6 +114,12 @@ public class VehicleServiceImpl implements VehicleService {
         }
     }
 
+    // Get the list of states.
+    @Override
+    public List<State> getStates() {
+        return stateRepository.findAll();
+    }
+
     // Add a list of years.
     @Override
     public void addYears(List<Integer> years) {
@@ -104,6 +128,12 @@ public class VehicleServiceImpl implements VehicleService {
                 yearRepository.save(new Year(year));
             }
         }
+    }
+
+    // Get a list of years.
+    @Override
+    public List<Year> getYears() {
+        return yearRepository.findAll();
     }
 
     // Add a list of models.
@@ -120,5 +150,11 @@ public class VehicleServiceImpl implements VehicleService {
                 modelRepository.save(model);
             }
         }
+    }
+
+    // Get models for a matching makeId.
+    @Override
+    public List<Model> getModels(int makeId) {
+        return modelRepository.findByMakeId(makeId);
     }
 }

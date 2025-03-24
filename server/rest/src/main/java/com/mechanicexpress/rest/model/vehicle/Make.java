@@ -1,5 +1,6 @@
 package com.mechanicexpress.rest.model.vehicle;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.util.List;
 
@@ -13,6 +14,7 @@ public class Make {
     @Column(name="name", nullable=false, unique=true)
     private String name;
 
+    @JsonIgnore
     @OneToMany(mappedBy="make", cascade = CascadeType.ALL)
     private List<Model> models;
 

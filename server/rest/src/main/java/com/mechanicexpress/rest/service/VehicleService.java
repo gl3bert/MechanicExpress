@@ -11,14 +11,18 @@ import java.util.List;
  */
 
 public interface VehicleService {
-    boolean addVehicle(Vehicle vehicle);
-
+    void addVehicle(Vehicle vehicle);
 
     // Supplemental functions.
     void addMakes(List<String> makes);
     Make getMake(String name);
+    List<Make> getMakes();
     void addColors(List<String> color);
+    List<Color> getColors();
     void addStates(List<String> state);
+    List<State> getStates();
     void addYears(List<Integer> years);
+    List<Year> getYears();
     void addModels(List<Model> models);
+    List<Model> getModels(int makeId);
 }

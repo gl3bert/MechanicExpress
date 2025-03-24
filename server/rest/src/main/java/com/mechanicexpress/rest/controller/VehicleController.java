@@ -1,8 +1,11 @@
 package com.mechanicexpress.rest.controller;
 
-import com.mechanicexpress.rest.model.vehicle.Make;
+import com.mechanicexpress.rest.model.Vehicle;
+import com.mechanicexpress.rest.model.vehicle.*;
 import com.mechanicexpress.rest.model.vehicle.Model;
 import com.mechanicexpress.rest.service.VehicleService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -24,7 +27,15 @@ public class VehicleController {
         this.vehicleService = vehicleService;
     }
 
-
+    @PostMapping("/add")
+    public ResponseEntity<String> addVehicle(@RequestBody Vehicle vehicle) {
+        try {
+            vehicleService.addVehicle(vehicle);
+            return ResponseEntity.ok("Vehicle added successfully!");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error adding vehicle: " + e.getMessage());
+        }
+    }
 
     /* Handling for adding new supplemental data to the tables */
 
@@ -33,9 +44,19 @@ public class VehicleController {
         vehicleService.addMakes(make);
     }
 
+    @GetMapping("/make/all")
+    public List<Make> getMakes() {
+        return vehicleService.getMakes();
+    }
+
     @PostMapping("/color/add")
     public void addColors(@RequestBody List<String> colors) {
         vehicleService.addColors(colors);
+    }
+
+    @GetMapping("/color/all")
+    public List<Color> getColors() {
+        return vehicleService.getColors();
     }
 
     @PostMapping("/year/add")
@@ -43,9 +64,19 @@ public class VehicleController {
         vehicleService.addYears(years);
     }
 
+    @GetMapping("/year/all")
+    public List<Year> getYears() {
+        return vehicleService.getYears();
+    }
+
     @PostMapping("/state/add")
     public void addStates(@RequestBody List<String> states) {
         vehicleService.addStates(states);
+    }
+
+    @GetMapping("/state/all")
+    public List<State> getStates() {
+        return vehicleService.getStates();
     }
 
     @PostMapping("/model/add")
@@ -59,5 +90,10 @@ public class VehicleController {
             models.add(model);
         }
         vehicleService.addModels(models);
+    }
+
+    @GetMapping("/model/{makeId}")
+    public List<Model> getModelsByMakeId(@PathVariable int makeId) {
+        return vehicleService.getModels(makeId);
     }
 }
