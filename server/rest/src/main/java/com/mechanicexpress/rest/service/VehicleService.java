@@ -11,7 +11,7 @@ import java.util.List;
  */
 
 public interface VehicleService {
-    void addVehicle(Vehicle vehicle);
+    void addVehicle(VehicleRequest vehicle);
 
     // Supplemental functions.
     void addMakes(List<String> makes);

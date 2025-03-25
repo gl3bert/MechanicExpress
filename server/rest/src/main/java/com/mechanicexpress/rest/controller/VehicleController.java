@@ -28,7 +28,7 @@ public class VehicleController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<String> addVehicle(@RequestBody Vehicle vehicle) {
+    public ResponseEntity<String> addVehicle(@RequestBody VehicleRequest vehicle) {
         try {
             vehicleService.addVehicle(vehicle);
             return ResponseEntity.ok("Vehicle added successfully!");

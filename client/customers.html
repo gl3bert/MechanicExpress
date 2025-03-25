@@ -24,7 +24,7 @@
             <img src="src/create_user.png" alt="Create Icon">
             <span>New Customer</span>
         </button>
-        <button onclick="window.location.href='invoices.html'">
+        <button>
             <img src="src/search.png" alt="Search Icon">
             <span>Search</span>
         </button>
@@ -37,8 +37,9 @@
 
 <div class="popup customerinput-popup">
     <div class="popup-header">
-        <h3>New Customer</h3>
+        <h3 id="customerFormMode">New Customer</h3>
     </div>
+
     <div class="popup-container">
         <div class="data-fields">
             <div class="popup-data-field">
@@ -64,7 +65,7 @@
                 <span>Add Vehicle</span>
             </button>
             <button type="button" class="popup-button cancel" onclick="closeCustomerForm()">
-                <img src="src/cancel.png" alt="Cancel Icon">
+                <img src="src/delete.png" alt="Cancel Icon">
                 <span>Cancel</span>
             </button>
             <button type="button" class="popup-button add" onclick="submitCustomerForm()">
@@ -127,9 +128,13 @@
             </tbody>
         </table>
         <div class="popup-buttons">
-            <button type="button" class="popup-button edit" onclick="enableEditCustomer()">
+            <button type="button" class="popup-button edit" onclick="editCustomer()">
                 <img src="src/edit.png" alt="Edit Icon">
                 <span>Edit</span>
+            </button>
+            <button type="button" class="popup-button delete" onclick="deleteCustomer()">
+                <img src="src/delete.png" alt="Delete Icon">
+                <span>Delete</span>
             </button>
             <button type="button" class="popup-button cancel" onclick="closeCustomerCard()">
                 <img src="src/x.png" alt="Close Icon">
@@ -156,9 +161,119 @@
     window.onload = positionPopups;
     window.onresize = positionPopups;
 
+    function viewCustomerDetails(customerId) {
+        closeDirectoryTable();
+        $.ajax({
+            url: `http://localhost:8080/api/customer/${customerId}`,
+            type: 'GET',
+            success: function(customer) {
+                // Populate customer details in the details view
+                $('#customerCardName').text(`${customer.first} ${customer.last}`);
+                $('#customerId').text(customer.customerId);
+                $('#customerPhone').text(customer.phone);
+                $('#customerEmail').text(customer.email);
+
+                // Prepopulate the customer form with current data
+                $('#first').val(customer.first);
+                $('#last').val(customer.last);
+                $('#phone').val(customer.phone);
+                $('#email').val(customer.email);
+
+                // Change form mode to Edit
+                $('#customerFormMode').text('Edit Customer');
+
+                $('.customer-card-popup').show();
+
+                // Update the form's submit action for editing
+                $('.popup-button.add').off('click').on('click', function() {
+                    editCustomer(customer.customerId);
+                });
+            },
+            error: function(error) {
+                alert('Error fetching customer details: ' + error.responseText);
+            }
+        });
+    }
+
+    function editCustomer() {
+        // Show the customer form first
+        const customerId = $('#customerId').text();
+
+        // Fetch the customer details
+        $.ajax({
+            url: `http://localhost:8080/api/customer/${customerId}`,
+            type: 'GET',
+            success: function(customer) {
+                // Populate the form with customer data
+                $('#first').val(customer.first);
+                $('#last').val(customer.last);
+                $('#phone').val(customer.phone);
+                $('#email').val(customer.email);
+
+                // Change the form header to indicate Edit mode
+                $('#customerFormMode').text('Edit Customer');
+
+                closeCustomerCard();
+                $('.customerinput-popup').show();
+
+                // Update the Add button to act as an Edit button
+                $('.popup-button.add').off('click').on('click', function () {
+                    submitEditedCustomer(customerId);
+                });
+            },
+            error: function(error) {
+                alert('Error fetching customer details: ' + error.responseText);
+            }
+        });
+    }
+
+    function submitEditedCustomer(customerId) {
+        const first = $('#first').val().trim();
+        const last = $('#last').val().trim();
+        const phone = $('#phone').val().trim();
+        const email = $('#email').val().trim();
+
+        if (first === '' || last === '' || phone === '' || email === '') {
+            alert('All fields are required.');
+            return;
+        }
+        if (!isValidPhone(phone)) {
+            alert('Phone number must be exactly 10 digits.');
+            return;
+        }
+        if (!isValidEmail(email)) {
+            alert('Enter a valid email address.');
+            return;
+        }
+
+        const customerData = `first=${encodeURIComponent(first)}&last=${encodeURIComponent(last)}&phone=${encodeURIComponent(phone)}&email=${encodeURIComponent(email)}`;
+
+        $.ajax({
+            url: `http://localhost:8080/api/customer/update/${customerId}`,
+            type: 'PUT',
+            contentType: 'application/x-www-form-urlencoded',
+            data: customerData,
+            success: function(response) {
+                alert('Customer updated successfully!');
+                closeCustomerForm();
+            },
+            error: function(error) {
+                alert('Error updating customer: ' + error.responseText);
+            }
+        });
+    }
+
+
     function showCustomerForm() {
+        $('#customerFormMode').text('Create Customer');
         $('.directory-popup').hide();
         $('.customerinput-popup').show();
+        $('.customer-card-popup').hide();
+
+        $('#first').val("");
+        $('#last').val("");
+        $('#phone').val("");
+        $('#email').val("");
     }
 
     function closeCustomerForm() {
@@ -261,60 +376,29 @@
         });
     }
 
-    function viewCustomerDetails(customerId) {
-        closeDirectoryTable();
-        $.ajax({
-            url: `http://localhost:8080/api/customer/${customerId}`,
-            type: 'GET',
-            success: function(customer) {
-                // Populate customer details
-                $('#customerCardName').text(`${customer.first} ${customer.last}`);
-                $('#customerId').text(customer.customerId);
-                $('#customerPhone').text(customer.phone);
-                $('#customerEmail').text(customer.email);
-
-                // Fetch associated vehicles
-                $.ajax({
-                    url: `http://localhost:8080/api/customer/${customerId}/vehicles`,
-                    type: 'GET',
-                    success: function(vehicles) {
-                        let vehicleTableBody = $('#vehicleTable tbody');
-                        vehicleTableBody.empty();
-
-                        if (vehicles.length > 0) {
-                            vehicles.forEach(vehicle => {
-                                vehicleTableBody.append(`
-                                <tr>
-                                    <td>${vehicle.make}</td>
-                                    <td>${vehicle.model}</td>
-                                    <td>${vehicle.year}</td>
-                                    <td>${vehicle.plate}</td>
-                                </tr>
-                            `);
-                            });
-                        } else {
-                            vehicleTableBody.append('<tr><td colspan="4">No vehicles found.</td></tr>');
-                        }
-                    },
-                    error: function(error) {
-                        console.error('Error fetching vehicles:', error);
-                    }
-                });
-
-                $('.customer-card-popup').show();
-            },
-            error: function(error) {
-                alert('Error fetching customer details: ' + error.responseText);
-            }
-        });
-        showDirectoryTable();
-    }
 
     function closeCustomerCard() {
         $('.customer-card-popup').hide();
     }
 
+    function deleteCustomer() {
+        const customerId = $('#customerId').text(); // Get customer ID from the customer details popup
 
+        if (confirm(`Are you sure you want to delete the customer with ID ${customerId}?`)) {
+            $.ajax({
+                url: `http://localhost:8080/api/customer/delete/${customerId}`,
+                type: 'DELETE',
+                success: function(response) {
+                    alert('Customer deleted successfully!');
+                    closeCustomerCard(); // Close the customer card popup after deletion
+                    showDirectoryTable(); // Refresh the customer directory table
+                },
+                error: function(error) {
+                    alert('Error deleting customer: ' + error.responseText);
+                }
+            });
+        }
+    }
 
 </script>
 
@@ -445,8 +529,6 @@
         display: flex;
         flex-direction: column;
     }
-
-
 </style>
 </body>
 </html>

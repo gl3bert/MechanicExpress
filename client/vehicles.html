@@ -71,11 +71,11 @@
             </div>
             <div class="popup-data-field">
                 <label for="license_plate">License Plate</label>
-                <input type="text" id="license_plate" name="license_plate" required>
+                <input type="text" id="license_plate" name="license_plate" maxlength="8" required>
             </div>
             <div class="popup-data-field">
                 <label for="vin">VIN</label>
-                <input type="text" id="vin" name="vin" required>
+                <input type="text" id="vin" name="vin" minlength="17" maxlength="17" required pattern="[A-HJ-NPR-Z0-9]{17}" title="VIN numbers are 17 characters. Check your input.">
             </div>
         </div>
         <div class="popup-buttons">
@@ -123,12 +123,12 @@
 
     function submitVehicleForm() {
         let vehicleData = {
-            makeId: $("#make").val(),
-            modelId: $("#model").val(),
+            make: $("#make").val(),
+            model: $("#model").val(),
             year: $("#year").val(),
-            colorId: $("#color").val(),
-            stateId: $("#state").val(),
-            licensePlate: $("#license_plate").val(),
+            color: $("#color").val(),
+            state: $("#state").val(),
+            plate: $("#license_plate").val(),
             vin: $("#vin").val()
         };
 
@@ -167,6 +167,15 @@
         loadYears();
         loadColors();
         loadStates();
+    });
+
+    document.getElementById("vehicleinput-popup").addEventListener("submit", function (event) {
+        let vinInput = document.getElementById("vin").value;
+
+        if (vinInput.length !== 17) {
+            alert("VIN must be exactly 17 characters long.");
+            event.preventDefault(); // Prevent form submission
+        }
     });
 
     function loadMakes() {

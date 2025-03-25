@@ -37,13 +37,21 @@ public class VehicleServiceImpl implements VehicleService {
 
     // Add a new vehicle.
     @Override
-    public void addVehicle(Vehicle vehicle) {
+    public void addVehicle(VehicleRequest request) {
+        Make make = makeRepository.findById(request.getMake()).orElseThrow(() -> new RuntimeException("Make not found"));
+        Model model = modelRepository.findById(request.getModel()).orElseThrow(() -> new RuntimeException("Model not found"));
+        Year year = yearRepository.findById(request.getYear()).orElseThrow(() -> new RuntimeException("Year not found"));
+        Color color = colorRepository.findById(request.getColor()).orElseThrow(() -> new RuntimeException("Color not found"));
+        State state = stateRepository.findById(request.getState()).orElseThrow(() -> new RuntimeException("State not found"));
+        Vehicle vehicle = new Vehicle(make, model, year, color, state, request.getPlate(), request.getVin());
+        System.out.println(vehicle.toString());
         if (vehicleRepository.findMaxVehicleId() != null) {
             vehicle.setVehicleId(vehicleRepository.findMaxVehicleId() + 1);
         }
         else {
-            vehicle.setVehicleId(1);
+            vehicle.setVehicleId(1000);
         }
+        vehicleRepository.save(vehicle);
     }
 
     /* Supplemental methods for populating SQL tables with sample values */

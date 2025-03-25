@@ -6,6 +6,7 @@ import com.mechanicexpress.rest.service.CustomerService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Implementation for CustomerService interface.
@@ -30,6 +31,30 @@ public class CustomerServiceImpl implements CustomerService {
         } catch (Exception e) {
             e.printStackTrace();
             return false;
+        }
+    }
+
+    // Delete an existing customer.
+    @Override
+    public void deleteCustomer(int customerId) {
+        customerRepository.deleteById(customerId);
+    }
+
+    // Update an existing customer.
+    @Override
+    public Customer updateCustomer(int customerId, String firstName, String lastName, String phone, String email) {
+        Optional<Customer> c = customerRepository.findById(customerId);
+        if (c.isPresent()) {
+            Customer customer = c.get();
+            customer.setFirst(firstName);
+            customer.setLast(lastName);
+            customer.setPhone(phone);
+            customer.setEmail(email);
+            customer.setCustomerId(customerId);
+            customerRepository.updateCustomerById(customerId, firstName, lastName, phone, email);  // Save the updated customer
+            return customer;
+        } else {
+            return null;
         }
     }
 

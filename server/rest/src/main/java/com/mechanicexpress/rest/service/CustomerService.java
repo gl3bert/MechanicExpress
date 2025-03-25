@@ -12,6 +12,8 @@ import java.util.List;
 
 public interface CustomerService {
     boolean createCustomer(Customer customer);
+    void deleteCustomer(int customerId);
+    Customer updateCustomer(int customerId, String firstName, String lastName, String phone, String email);
     Customer getCustomer(int customerId);
     List<Customer> getAllCustomers();
 }
