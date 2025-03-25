@@ -59,6 +59,9 @@
                 <input type="text" id="email" name="email" required>
             </div>
         </div>
+
+        <input type="hidden" id="id">
+
         <div class="popup-buttons">
             <button type="button" class="popup-button addvehicle">
                 <img src="src/keys.png" alt="Save Icon">
@@ -195,6 +198,36 @@
         });
     }
 
+
+    function editCustomer() {
+        const customerId = $('#customerId').text();
+
+        $.ajax({
+            url: `http://localhost:8080/api/customer/${customerId}`,
+            type: 'GET',
+            success: function(customer) {
+                $('#customerId').val(customer.customerId); // Set the ID
+                $('#first').val(customer.first);
+                $('#last').val(customer.last);
+                $('#phone').val(customer.phone);
+                $('#email').val(customer.email);
+
+                $('#customerFormMode').text('Edit Customer');
+                closeCustomerCard();
+                $('.customerinput-popup').show();
+
+                // Ensure submit button updates the existing customer
+                $('.popup-button.add').off('click').on('click', submitCustomerForm);
+            },
+            error: function(error) {
+                alert('Error fetching customer details: ' + error.responseText);
+            }
+        });
+    }
+
+
+
+/*
     function editCustomer() {
         // Show the customer form first
         const customerId = $('#customerId').text();
@@ -226,6 +259,8 @@
             }
         });
     }
+
+ */
 
     function submitEditedCustomer(customerId) {
         const first = $('#first').val().trim();
@@ -295,7 +330,7 @@
     function isValidEmail(email) {
         return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
     }
-
+/*
     function submitCustomerForm() {
         const first = $('#first').val().trim();
         const last = $('#last').val().trim();
@@ -331,6 +366,8 @@
             }
         });
     }
+
+ */
 
     $(document).ready(function () {
         $('.popup-button.cancel').click(function () {
@@ -399,6 +436,66 @@
             });
         }
     }
+
+
+    function submitCustomerForm() {
+        const customerId = $('#customerId').val().trim();
+        const first = $('#first').val().trim();
+        const last = $('#last').val().trim();
+        const phone = $('#phone').val().trim();
+        const email = $('#email').val().trim();
+
+        if (first === '' || last === '' || phone === '' || email === '') {
+            alert('All fields are required.');
+            return;
+        }
+        if (!isValidPhone(phone)) {
+            alert('Phone number must be exactly 10 digits.');
+            return;
+        }
+        if (!isValidEmail(email)) {
+            alert('Enter a valid email address.');
+            return;
+        }
+
+        const customerData = { first, last, phone, email };
+        const customerData2 = `first=${encodeURIComponent(first)}&last=${encodeURIComponent(last)}&phone=${encodeURIComponent(phone)}&email=${encodeURIComponent(email)}`;
+
+
+        if (customerId) {
+            // If customerId exists, update existing customer
+            $.ajax({
+                url: `http://localhost:8080/api/customer/update/${customerId}`,
+                type: 'PUT',
+                contentType: 'application/x-www-form-urlencoded',
+                data: customerData2,
+                success: function(response) {
+                    alert('Customer updated successfully!');
+                    closeCustomerForm();
+                },
+                error: function(error) {
+                    alert('Error updating customer: ' + error.responseText);
+                }
+            });
+        } else {
+            // Otherwise, create a new customer
+            $.ajax({
+                url: 'http://localhost:8080/api/customer',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(customerData),
+                success: function(response) {
+                    alert('Customer created successfully!');
+                    closeCustomerForm();
+                    showDirectoryTable(); // Refresh directory after creation
+                },
+                error: function(error) {
+                    alert('Error creating customer: ' + error.responseText);
+                }
+            });
+        }
+    }
+
 
 </script>
 
