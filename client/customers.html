@@ -225,80 +225,6 @@
         });
     }
 
-
-
-/*
-    function editCustomer() {
-        // Show the customer form first
-        const customerId = $('#customerId').text();
-
-        // Fetch the customer details
-        $.ajax({
-            url: `http://localhost:8080/api/customer/${customerId}`,
-            type: 'GET',
-            success: function(customer) {
-                // Populate the form with customer data
-                $('#first').val(customer.first);
-                $('#last').val(customer.last);
-                $('#phone').val(customer.phone);
-                $('#email').val(customer.email);
-
-                // Change the form header to indicate Edit mode
-                $('#customerFormMode').text('Edit Customer');
-
-                closeCustomerCard();
-                $('.customerinput-popup').show();
-
-                // Update the Add button to act as an Edit button
-                $('.popup-button.add').off('click').on('click', function () {
-                    submitEditedCustomer(customerId);
-                });
-            },
-            error: function(error) {
-                alert('Error fetching customer details: ' + error.responseText);
-            }
-        });
-    }
-
- */
-
-    function submitEditedCustomer(customerId) {
-        const first = $('#first').val().trim();
-        const last = $('#last').val().trim();
-        const phone = $('#phone').val().trim();
-        const email = $('#email').val().trim();
-
-        if (first === '' || last === '' || phone === '' || email === '') {
-            alert('All fields are required.');
-            return;
-        }
-        if (!isValidPhone(phone)) {
-            alert('Phone number must be exactly 10 digits.');
-            return;
-        }
-        if (!isValidEmail(email)) {
-            alert('Enter a valid email address.');
-            return;
-        }
-
-        const customerData = `first=${encodeURIComponent(first)}&last=${encodeURIComponent(last)}&phone=${encodeURIComponent(phone)}&email=${encodeURIComponent(email)}`;
-
-        $.ajax({
-            url: `http://localhost:8080/api/customer/update/${customerId}`,
-            type: 'PUT',
-            contentType: 'application/x-www-form-urlencoded',
-            data: customerData,
-            success: function(response) {
-                alert('Customer updated successfully!');
-                closeCustomerForm();
-            },
-            error: function(error) {
-                alert('Error updating customer: ' + error.responseText);
-            }
-        });
-    }
-
-
     function showCustomerForm() {
         $('#customerFormMode').text('Create Customer');
         $('.directory-popup').hide();
@@ -330,44 +256,6 @@
     function isValidEmail(email) {
         return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
     }
-/*
-    function submitCustomerForm() {
-        const first = $('#first').val().trim();
-        const last = $('#last').val().trim();
-        const phone = $('#phone').val().trim();
-        const email = $('#email').val().trim();
-
-        if (first === '' || last === '' || phone === '' || email === '') {
-            alert('All fields are required.');
-            return;
-        }
-        if (!isValidPhone(phone)) {
-            alert('Phone number must be exactly 10 digits.');
-            return;
-        }
-        if (!isValidEmail(email)) {
-            alert('Enter a valid email address.');
-            return;
-        }
-
-        const customerData = { first, last, phone, email };
-
-        $.ajax({
-            url: 'http://localhost:8080/api/customer',
-            type: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify(customerData),
-            success: function(response) {
-                alert('Customer created successfully!');
-                closeCustomerForm();
-            },
-            error: function(error) {
-                alert('Error creating customer: ' + error.responseText);
-            }
-        });
-    }
-
- */
 
     $(document).ready(function () {
         $('.popup-button.cancel').click(function () {
@@ -495,8 +383,6 @@
             });
         }
     }
-
-
 </script>
 
 
